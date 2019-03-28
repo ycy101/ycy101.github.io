@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- 上述3个meta标签*必须*放在最前面，任何其他内容都*必须*跟随其后！ -->
+<title>ycy 101 </title>
+
+<!-- JQuery cdn -->
+<script src="https://cdn.bootcss.com/jquery/1.11.0/jquery.min.js"></script>
+
+<style>
+	/*样式初始化*/
+	* {
+		margin: 0; 
+		padding: 0;
+		list-style: none;
+		text-decoration: none;
+	}
+
+	html, body {
+		width: 100%;
+		height: 100%;
+		overflow: hidden;
+	}
+
+	img {
+		border: 0;
+	}
+
+	/*背景图片*/
+	.bg { 
+		width: auto;
+		height: 100%;
+		/*限制最大屏幕尺寸并居中*/
+		max-width: 768px;
+		margin: 0 auto;
+		/*背景图片并铺满屏幕*/
+		background: url(images/bg1.png) no-repeat;
+		background-size: 100% 100%;
+		-moz-background-size: 100% 100%;
+
+		position: relative;
+		z-index: 100;
+	}
+
+	/*加载游戏*/
+	.loading {
+		width: 186px;
+		height: 279px;
+		/*text-align: center;*/
+		position: absolute;
+		top: 100px;
+		left: 50%;
+		margin-left: -93px;
+		z-index: 101;
+	}
+
+	/*游戏说明*/
+	.tips {
+		width: 186px;
+		height: 279px;
+		/*text-align: center;*/
+		position: absolute;
+		top: 100px;
+		left: 50%;
+		margin-left: -93px;
+		display: none;
+		z-index: 102;
+	}
+
+	/*选项*/
+	.gameOptions {
+		width: 186px;
+		height: 279px;
+		/*text-align: center;*/
+		position: absolute;
+		top: 100px;
+		left: 50%;
+		margin-left: -93px;
+		display: none;
+		z-index: 101;
+	}
+
+	.gameOptions p {
+		border: 1px solid #090909;
+		height: 30px;
+		line-height: 30px;
+		text-align: center;
+	}
+
+	/*果体图片*/
+	#optionImg {
+		width: 186px;
+		height: 279px;
+		position: absolute;
+		top: 100px;
+		left: 50%;
+		margin-left: -80px;
+		z-index: 102;
+	}
+
+	#optionTips {
+		width: 186px;
+		height: 279px;
+		position: absolute;
+		top: 100px;
+		left: 50%;
+		margin-left: -80px;
+		z-index: 103;
+	}
+
+	/*绳子*/
+	.rope{ 
+		width: 10px;
+		background: #FEEA63;
+		height: 20px;
+		position: absolute;
+		top: 20px;
+		left: 50%;
+		margin-left: -5px;
+		box-shadow: 2px 2px 5px rgba(0,0,0,0.3);
+	}
+
+	/*爪子*/
+	.claw{
+		width: 110px;
+		height: 85px;
+		position: absolute;
+		top: 40px;
+		left: 50%;
+		margin-left: -55px;
+	}
+
+	/*锦鲤*/
+	.ycy{
+		width: 100%;
+		max-width: 678px;
+		height: auto;
+		overflow: hidden;
+		position: absolute;
+		top: 40px;
+		left: 0;
+		z-index: 99;
+	}
+
+	/*锦鲤滚动*/
+	#ycyBox{
+		width:100%;
+		height:90px;
+		white-space:nowrap;
+		overflow:hidden;
+		position:absolute;
+		bottom:0;
+		left:0;
+	}
+
+	#ycyBox1, #ycyBox2 {
+		display:inline;
+	}
+
+	#ycyBox img{
+		display:inline-block;
+		height:90px;
+	}
+
+	/*开始按钮*/
+	.btn {
+		width: 110px;
+		height: 110px;
+		position: absolute;
+		bottom: 0;
+		left: 50%;
+		margin-left: -55px;
+	}
+	
+	.startBtn { 
+		background: url(images/startOff.png) no-repeat center;
+		background-size: contain;
+		width: 110px;
+		height: 110px;
+		z-index: 999;
+	}
+
+	.endBtn {
+		background:url(images/startOn.png) no-repeat center;
+		background-size:contain;
+		width:120px;
+		height:120px;
+	}
+
+	.win{
+		width:110px;
+		height:105px;
+		display:none;
+		margin:0 auto; 
+		background:url(images/clawOn.png);
+		background-size:cover;
+		overflow:hidden;
+	}
+
+	.win img{
+		display:block;
+		margin:0 auto;
+		margin-top:12px;
+	}
+
+	.btn{
+		width:120px;
+		height:100px;
+		position:absolute;
+		bottom:0;
+		left:50%;
+		margin-left:-60px; 
+		z-index: 100;
+	}
+
+	.claw.on .lose{
+		display:none;
+	}
+
+	.claw.on .win{
+		display:block;
+	}
+
+
+</style>
+</head>
+
+<body>
+<!-- 背景 -->
+<div class="bg"></div>
+
+<!-- 加载页面 -->
+<div class="loading">
+	<img id="loadImg" src="images/loading.png" width="186" height="279" alt=""><br>
+</div>
+
+<!-- 说明页面 -->
+<div class="tips">
+	<p>尊敬的玩家爸爸，欢迎使用本机来抓锦鲤。</p><br>
+
+	<p >	
+		洗脸刷牙抓锦鲤，<br>
+		人生处处好运来。<br>
+	</p><br>
+
+	<p>接下来根据您的喜好，生成您的专属锦鲤。</p>
+</div>
+
+<!-- 游戏选项 -->
+<div class="gameOptions">
+	<span>本机为您精心准备了几套衣服，您希望您的锦鲤穿</span><br><br>
+
+	<p id="option1">果&nbsp;&nbsp;&nbsp;&nbsp;体</p><br>
+	<p id="option2">比基尼</p><br>
+	<p id="option3">水手服</p>
+
+</div>
+
+<!-- 选项对应提示 -->
+<div id="optionTips"   style="display:none;">
+	<p>服装正在设计中...</p>
+</div>
+
+<!-- 选项对应图片 -->
+<div id="optionImg"   style="display:none;">
+	<img src="images/guoti.jpg" alt="">
+</div>
+	
+<!-- 游戏主体 -->
+<div class="game" style="display:none;">
+	<div class="gameBox">
+		<!-- 绳子 -->
+    	<div class="rope"></div>
+		<!-- 爪子 -->
+        <div class="claw">
+			<img src="images/clawOff.png" class="lose">
+            <div class="win">
+            	<img src="images/ycy1.png">
+            </div>
+        </div>
+    </div>
+
+	<!-- 锦鲤 -->
+	<div class="ycy">
+		<!--锦鲤滚动范围-->
+	    <div id="ycyBox">
+			<div id="ycyBox1">
+				<img src="images/ycy1.png" >
+	    		<img src="images/ycy1.png" >
+	    		<img src="images/ycy1.png" >
+	    		<img src="images/ycy1.png" >
+	    		<img src="images/ycy1.png" >
+	    		<img src="images/ycy1.png" >
+	    		<img src="images/ycy101.png" > <!-- 抓到这个厉害了，锦鲤本鲤 -->
+	    		<img src="images/ycy1.png" >
+	    		<img src="images/ycy1.png" >
+	    		<img src="images/ycy1.png" >
+	    		<img src="images/ycy1.png" >
+	    		<img src="images/ycy1.png" >
+	    		<img src="images/ycy1.png" >
+	    		<img src="images/ycy1.png" >
+	    		<img src="images/ycy1.png" >
+			</div>
+			<div id="ycyBox2"></div>
+		</div>
+	</div>
+</div>
+
+<!-- 游戏按钮 -->
+<div class="btn">
+	<!-- 点击前 -->
+	<div class="startBtn"></div>
+	<!-- 点击后-->
+    <div class="endBtn"></div>
+</div>
+
+<!-- 游戏结束提示 -->
+<div class="gamevoer">
+	
+</div>
+
+
+<script>
+$(function() {
+
+	// 默认按钮不可以点击
+	$(".startBtn").css({display:"none"});
+
+	// 游戏加载
+	$("#loadImg").click(function(){
+		$(".loading").hide();
+		$(".tips").fadeIn(4000);
+	});
+
+	// 游戏说明
+	$(".tips").click(function(){
+		$(".tips").hide();
+		$(".gameOptions").fadeIn(4000);
+	});
+
+	// 游戏选项
+	$("#option1").click(function(){
+		$("#optionImg").css({display:"block"});
+		$(".gameOptions").css({display:"none"});
+	});
+
+	$("#option2").click(function(){
+		$("#optionTips").css({display:"block"});
+		$(".gameOptions").css({display:"none"});
+	});
+
+	$("#optionTips").click(function(){
+		$("#optionTips").css({display:"none"});
+		$(".gameOptions").css({display:"block"});
+	});
+
+	$("#optionImg").click(function(){
+		$("#optionImg").css({display:"none"});
+		$(".gameOptions").css({display:"block"});
+	});
+
+	// 显示游戏主体
+	$("#option3").click(function(){
+		$(".game").css({display:"block"});
+		$(".gameOptions").css({display:"none"});
+		clickBtn(); // 按钮可以点击
+	});
+
+	// 游戏逻辑部分
+
+	// 初始化变量
+	var cy = 0; //锦鲤的
+	var isOk = false; //是否抓到
+	var count = 0; // 计数
+	
+	scrollLeft();//锦鲤滚动
+
+	var varClaw = $(".claw").offset().left + 55;//首先获取爪子的位置
+
+	// 游戏区域
+	var gameBoxHeight=$("body").height()-230;
+
+	var clawHight = gameBoxHeight - 115;//爪子伸长的距离
+
+	// 赋值给活动区域高度
+	$(".ycy").css({height:gameBoxHeight});
+
+	/*点击按钮*/
+	$(".startBtn").click(function(){
+		
+		if(count >= 3) {
+			alert("你已经抓住3次了，明天再来");
+			return;
+		}
+
+		$(this).css({display:"none"});// 改变按钮的点击状态
+		$(".rope").animate({height:clawHight}, 2000);// 绳子伸下去
+		$(".claw").animate({top:clawHight+20}, 2000);// 爪子伸下去
+			
+		
+		// 判断抓没抓到锦鲤
+		ok = setTimeout(isGetYcy, 2000);
+		
+		ycyDST = setTimeout(ycyDestroy, 4000);//锦鲤消失
+		
+		btnON = setTimeout(clickBtn, 4000);//按钮可以点击
+
+		$(".rope").animate({height:20}, 2000);//绳子缩回来
+		$(".claw").animate({top:40}, 2000);//爪子缩回来
+
+		if(count > 3) {
+			alert("你已经抓住3次了，明天再来");
+		}
+	});
+
+	/*锦鲤滚动*/
+	function scrollLeft(){
+		var speed = 20;
+		var ycyArr = $("#ycyBox1").html();
+		$("#ycyBox2").html(ycyArr);
+		function Marquee(){
+			cy++;
+			if($("#ycyBox2").width() - $("#ycyBox").scrollLeft() <= 0){
+				cy = 0;        
+				$("#ycyBox").scrollLeft(cy);
+			}else{
+				$("#ycyBox").scrollLeft(cy);
+			}
+		}
+
+		ycyBOX=setInterval(Marquee,speed);
+		
+	}
+
+	// 抓到锦鲤
+	function getYcy(ycyTime){
+		$(".claw").addClass("on");
+		$(".win img").attr("src", ycyTime);
+	}
+
+	// 释放锦鲤
+	function ycyDestroy(){
+		$(".claw").removeClass("on");
+	}
+
+	// 点击按钮 默认可以点击 点击后，直到爪子回到初始位置，才可以再次点击
+	function clickBtn(){
+		$(".startBtn").css({display:"block"});
+	}
+
+	// 判断是否抓住锦鲤
+	function isGetYcy(){
+		// 打印出此时此刻每个锦鲤的位置
+		for(var i = 0; i < $("#ycyBox img").length; i++){
+			var l = $("#ycyBox img").eq(i).offset().left+41.61//此时此刻每个锦鲤的位置
+			if(l-20 <= varClaw && varClaw <= l+20){
+
+				// 抓到锦鲤
+				var ycyTime = $("#ycyBox img").eq(i).attr("src");
+
+				if(ycyTime == "images/ycy101.png") {
+					alert("抓到了锦鲤本鲤！");
+					return;
+				}
+
+				if(ycyTime == "images/spaceYcy.png") {
+					return;
+				}
+				
+				$("#ycyBox img").eq(i).attr("src", "images/spaceYcy.png");//替换这条锦鲤
+
+				setTimeout(getYcy(ycyTime),0);
+				isOk = true;
+				count++;
+				return;
+			}
+			// 没有抓到
+			isOk = false;			
+		}
+	}
+});
+</script>
+	
+</body>
+</html>
